@@ -1,0 +1,34 @@
+{
+  "name": "vueker",
+  "version": "0.1.0",
+  "description": "is the amazing vue datepicker component",
+  "main": "./dist/Vueker.vue",
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexandroBazan/Vueker.git"
+  },
+  "keywords": [
+    "vue",
+    "vueker",
+    "datepicker"
+  ],
+  "author": "Alexandro Bazán Ladines",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlexandroBazan/Vueker/issues"
+  },
+  "homepage": "https://github.com/AlexandroBazan/Vueker#readme",
+  "devDependencies": {
+    "mocha": "^4.0.1",
+    "mocha-webpack": "^0.7.0",
+    "vue-test-utils": "^1.0.0-beta.2",
+    "webpack": "^3.8.0"
+  }
+}
