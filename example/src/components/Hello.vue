@@ -1,12 +1,12 @@
 <template>
   <div class="hello">
     <vueker
-      lang="es" 
+      lang="es"
       format="DD/MM/YYYY"
       placeholder="Seleccione una fecha"
-      init-date="20/07/2017" 
-      min-date="13/06/2017" 
-      max-date="04/08/2017" 
+      init-date="20/07/2017"
+      min-date="13/06/2017"
+      max-date="04/08/2017"
       :sunday-at-the-end="true"
     >
     </vueker>

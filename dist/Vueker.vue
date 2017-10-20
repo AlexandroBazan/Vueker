@@ -2,7 +2,7 @@
   <div class="row">
   	<div class="col-lg-12" >
   		<div class="input-group" :id="vuekerInputId">
-  			<input class="form-control" :placeholder="placeholder" :value="showValue()">
+  			<input id="vueker-input" class="form-control" :placeholder="placeholder" :value="showValue">
         <!-- Datetime picker box -->
   			<div  class="dropdown-menu vueker-box" :class="{right:calendar.right,top:calendar.top}" v-show="isShowlable" :id="vuekerBoxId">
           <!-- Calendar menu -->
@@ -18,7 +18,7 @@
             <div class="col-xs-7 vueker-calendar-menu">
               <div class="btn-group" role="group">
                 <!-- Prev month button -->
-                <button type="button" class="btn btn-default btn-sm" @click="prevMonth()" :disabled="disabledPrevButton()">
+                <button id="prev-button" type="button" class="btn btn-default btn-sm" @click="prevMonth()" :disabled="disabledPrevButton()">
                   <span class="glyphicon glyphicon-chevron-left"></span>
                 </button>
                 <!-- [end] Prev month button -->
@@ -34,6 +34,7 @@
                 <!-- [end] Today button -->
                 <!-- Next month button -->
                 <button
+                  id="next-button"
                   type="button"
                   class="btn btn-default btn-sm"
                   @click="nextMonth()"
@@ -88,7 +89,7 @@
         <!-- [end] Datetime picker box -->
         <!-- Calendar input button -->
   			<span class="input-group-btn" :id="vuekerButtonId">
-  				<button class="btn btn-default" type="button" @click="showCalendar()">
+  				<button id="calendar-button" class="btn btn-default" type="button" @click="showCalendar()">
 					<span class="glyphicon glyphicon-calendar"></span>
   				</button>
   			</span>
@@ -99,7 +100,7 @@
 </template>
 
 <script>
-  'use strict';
+  //'use strict';
 
   import lang from './lang.js'
 
@@ -199,6 +200,14 @@
       texts: function () {
         return lang[this.lang];
       },
+      /**
+       * This function returns date with format
+       *
+       * @return {[string, null]}
+       */
+      showValue: function() {
+        return (this.selectedDate) ? this.selectedDate.format(this.format) : null;
+      },
     },
     methods: {
       /**
@@ -237,8 +246,7 @@
        * @param  {Date} initDate
        * @return {Array}
        */
-      createWeekDays: function(initDate) {
-        var date = initDate;
+      createWeekDays: function(date) {
         var week = [];
 
         for (var day = 0; day < 7; day++) {
@@ -344,8 +352,7 @@
 
         var body = document.getElementsByTagName('html');
 
-        body[0].addEventListener('click', function(e){
-
+        body[0].addEventListener('click', function(e) {
           var box = document.querySelector('#'+vm.vuekerBoxId).getBoundingClientRect();
           var btn = document.querySelector('#'+vm.vuekerButtonId).getBoundingClientRect();
 
@@ -443,14 +450,7 @@
         this.selectedDate = moment(date);
         this.makeCalendar(date.getFullYear(), date.getMonth())
       },
-      /**
-       * This function returns date with format
-       *
-       * @return {[string, null]}
-       */
-      showValue: function() {
-        return (this.selectedDate) ? this.selectedDate.format(this.format) : null;
-      },
+      
       /**
        * This function returns true when [month] equals calendar month
        * @param  {[Number]}  month
