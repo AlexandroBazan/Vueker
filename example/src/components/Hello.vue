@@ -8,20 +8,42 @@
       min-date="13/06/2017"
       max-date="04/08/2017"
       :sunday-at-the-end="true"
+      :visible-dates="visibleDates"
     >
     </vueker>
   </div>
 </template>
 
 <script>
-import Vueker from './Vueker'
+import Vueker from '../../../src/components/Vueker'
 
 export default {
   name: 'hello',
   components:{Vueker},
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to Your Vue.js App',
+      visibleDates: {
+        mode:'enable',
+        rules: {
+          role:{},
+          dates: [
+            '19/06/2017',
+            '20/07/2017',
+            '25/07/2017',
+            '02/08/2017'
+          ],
+          weekdays:[
+            'sunday',
+            'monday',
+            'pppp',
+          ],
+          ranges:[
+            {from:'03/07/2017', to:'08/07/2017'},
+            {from:'16/08/2017', to:'20/08/2017'},
+          ]
+        }
+      },
     }
   }
 }

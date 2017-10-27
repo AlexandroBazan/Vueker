@@ -2,7 +2,7 @@
   "name": "vueker",
   "version": "0.1.0",
   "description": "is the amazing vue datepicker component",
-  "main": "./dist/Vueker.vue",
+  "main": "./src/Vueker.vue",
   "directories": {
     "example": "example",
     "test": "test"
@@ -28,10 +28,10 @@
   },
   "homepage": "https://github.com/AlexandroBazan/Vueker#readme",
   "dependencies": {
-    "vue": "^2.3.3",
     "moment": "^2.11.1"
   },
   "devDependencies": {
+    "vue": "^2.3.3",
     "babel-core": "^6.26.0",
     "css-loader": "^0.28.7",
     "expect": "^21.2.1",

@@ -100,9 +100,9 @@
 </template>
 
 <script>
-  //'use strict';
-
-  import lang from './lang.js'
+  import lang from '../utils/lang.js'
+  import tools from '../utils/genericTools.js'
+  import visibleDates from '../utils/visibleDates.js'
 
   var moment = require('moment');
 
@@ -135,6 +135,14 @@
       },
       maxDate: {
       	type: [String, Object, Date],
+      	default: null
+      },
+      visibleDates: {
+      	type: [Object],
+      	default: {}
+      },
+      enabledDates: {
+      	type: [Object],
       	default: null
       }
     },
@@ -179,6 +187,8 @@
     	};
     },
     created: function () {
+      tools.presets.format = this.format;
+
       this.vuekerBoxId = "vueker-box-"+this._uid;
       this.vuekerButtonId = "vueker-btn-"+this._uid;
       this.vuekerInputId = "vueker-input-"+this._uid;
@@ -189,9 +199,7 @@
       this.mutable.maxDate = this.setDateProp(this.maxDate);
 
       if (this.initDate) {
-        this.selectedDate = (typeof this.initDate == 'string')
-                          ? moment(this.initDate,this.format)
-                          : moment(this.initDate);
+        this.selectedDate = this.createMomentDate(this.initDate);
 
         this.makeCalendar(this.selectedDate.year(), this.selectedDate.month());
       }
@@ -274,6 +282,7 @@
         this.setCalendar(fullYear, month);
 
         var firstDate = this.calendar.firstDate.getDate();
+
         var firstDay = this.calendar.firstDate.getDay();
 
         var startCalendar = firstDate - firstDay;
@@ -313,6 +322,9 @@
           this.isShowlable = !this.isShowlable;
         }
       },
+      createMomentDate: function(date) {
+        return (typeof date == 'string') ? moment(date,this.format) : moment(date);
+      },
       /**
        * This function set Today in selectedDate when its value is null
        *
@@ -339,6 +351,7 @@
           this.calendar.top = true;
         } else {
           box.style.bottom = 'inherit';
+          
           this.calendar.top = false;
         }
       },
@@ -408,9 +421,9 @@
        * @return {Boolean}
        */
       hasSelectDate: function(date) {
-        return this.selectedDate.year() == date.year()
-            && this.selectedDate.month() == date.month()
-            && this.selectedDate.date() == date.date();
+        let format = 'DD/MM/YYYY';
+
+        return this.selectedDate.format(format) == date.format(format);
       },
       /**
        * Setter function of selectedDate
@@ -450,9 +463,9 @@
         this.selectedDate = moment(date);
         this.makeCalendar(date.getFullYear(), date.getMonth())
       },
-      
       /**
        * This function returns true when [month] equals calendar month
+       * 
        * @param  {[Number]}  month
        * @return {Boolean}
        */
@@ -479,13 +492,30 @@
        * @return {[Boolean]}
        */
       isDisabled: function(date) {
-        var conditionA, conditionB;
 
-        conditionA = (this.minDate) ? (date.diff(this.mutable.minDate,'days') > -1) : true;
+        return (this.visibleDates.mode === 'enable') ? !this.runRules(date, this.visibleDates.rules) : this.runRules(date, this.visibleDates.rules);
+      },
 
-        conditionB = (this.maxDate) ? (date.diff(this.mutable.maxDate,'days') < 1) :true;
+      runRules: function(date, rules) {
+        for (var index in rules) {
+          var ruleIndex = this.getRuleIndex(index);
+          
+          if (ruleIndex && visibleDates[ruleIndex](date, rules[index])) {
+            return true;
+          }
+        }
 
-        return !(conditionA && conditionB);
+        return false;
+      },
+
+      getRuleIndex: function(index) {
+        var rules = {
+          dates: 'itsInDates',
+          ranges: 'itsInDateRanges',
+          weekdays: 'itsInWeekdays',
+        };
+
+        return rules[index];
       },
       /**
        * This function returns true when "today" is disabled
@@ -569,8 +599,6 @@
       top: inherit;
       border-bottom: inherit;
       border-top: 6px solid #fff;
-
-
   }
   .vueker-table{
   	width: 100%;
@@ -643,8 +671,6 @@
   .vueker-date:hover {
     cursor: pointer;
     background-color: #eaeaea;
-
-
   }
   .vueker-date.active{
     background-color: #337ab7;
