@@ -9,14 +9,17 @@
           <div class="row calendar-header">
             <!-- Calendar monthYear button -->
             <div class="col-xs-5">
-              <button type="button" class="btn btn-default btn-sm btn-month-year" >
+              <button  @click="showBoxState = 'months'" v-show="showBoxState == 'calendar'" type="button" class="btn btn-default btn-sm btn-month-year" >
                 {{texts.months[calendar.month.key]}} {{calendar.year}}
+              </button>
+              <button  @click="showBoxState = 'years'" v-show="showBoxState == 'months'" type="button" class="btn btn-default btn-sm btn-month-year" >
+                {{calendar.year}}
               </button>
             </div>
             <!-- [end] Calendar monthYear button -->
             <!-- Calendar pagination month menu -->
             <div class="col-xs-7 vueker-calendar-menu">
-              <div class="btn-group" role="group">
+              <div v-show="showBoxState == 'calendar'" class="btn-group" role="group">
                 <!-- Prev month button -->
                 <button id="prev-button" type="button" class="btn btn-default btn-sm" @click="prevMonth()" :disabled="disabledPrevButton()">
                   <span class="glyphicon glyphicon-chevron-left"></span>
@@ -85,6 +88,27 @@
 			    	</tbody>
 			    </table>
           <!-- [end] Calendar table -->
+          <!-- Months table -->
+  				<table class="vueker-table" v-show="showBoxState=='months'">
+  					
+			    	<tbody >
+              <!-- render weeks -->
+			    		<tr v-for="(monthInterval, indexInterval) in texts.shortenedMonths" :key="monthInterval.id">
+			    			<td 
+                  class="vueker-date" 
+                  :class="{
+                    'active':hasSelectMonth(month.key,calendar.year),
+                  }"
+                  v-for="(month, index) in monthInterval" :key="month.id"
+                  @click="makeCalendar(calendar.year,month.key);"
+                >
+			    				{{month.name}} 
+			    			</td>
+			    		</tr>
+              <!-- [end] render weeks -->
+			    	</tbody>
+			    </table>
+          <!-- [end] Months table -->
   			</div>
         <!-- [end] Datetime picker box -->
         <!-- Calendar input button -->
@@ -129,11 +153,11 @@
       	type: [String, Object, Date],
       	default: null
       },
-      minDate: {
+      startDate: {
       	type: [String, Object, Date],
       	default: null
       },
-      maxDate: {
+      endDate: {
       	type: [String, Object, Date],
       	default: null
       },
@@ -181,8 +205,8 @@
         vuekerButtonId:-2,
         vuekerInputId:-1,
         mutable:{
-          minDate:null,
-          maxDate:null,
+          startDate:null,
+          endDate:null,
         },
     	};
     },
@@ -195,8 +219,8 @@
 
       this.onBlur();
 
-      this.mutable.minDate = this.setDateProp(this.minDate);
-      this.mutable.maxDate = this.setDateProp(this.maxDate);
+      this.mutable.startDate = this.setDateProp(this.startDate);
+      this.mutable.endDate = this.setDateProp(this.endDate);
 
       if (this.initDate) {
         this.selectedDate = this.createMomentDate(this.initDate);
@@ -281,21 +305,19 @@
     	makeCalendar: function(fullYear, month) {
         this.setCalendar(fullYear, month);
 
-        var firstDate = this.calendar.firstDate.getDate();
-
-        var firstDay = this.calendar.firstDate.getDay();
-
-        var startCalendar = firstDate - firstDay;
+        var startCalendar = this.calendar.firstDate.getDate() - this.calendar.firstDate.getDay();
 
         if (this.sundayAtTheEnd) { ++startCalendar; }
 
         var initDate = new Date(this.calendar.year, this.calendar.month.number, startCalendar);
 
-        if (this.sundayAtTheEnd && firstDay === 0) {
+        if (this.sundayAtTheEnd && this.calendar.firstDate.getDay() === 0) {
           initDate.setDate(initDate.getDate() - 7)
         }
 
         this.calendar.weeks = this.createWeeks(initDate);
+
+        this.showBoxState = 'calendar';
     	},
 
       /**
@@ -306,20 +328,16 @@
       showCalendar: function(){
         var input = document.getElementById(this.vuekerInputId);
 
-        if(input!==undefined && input!==null) {
-          var inputPositions = input.getBoundingClientRect();
-
-          var windowHeight = window.innerHeight
-                          || document.documentElement.clientHeight
-                          || document.body.clientHeight;
-
-          this.setVerticalPositionCalendarBox(windowHeight,inputPositions.top,input);
+        if(input !== undefined && input !== null) {
+          this.setVerticalPositionCalendarBox(tools.getWindowHeight(), input.getBoundingClientRect().top,input);
 
           this.calendar.right = input.offsetWidth > 266;
 
           this.setDefaultSelectedDate();
 
           this.isShowlable = !this.isShowlable;
+
+          this.showBoxState = 'calendar';
         }
       },
       createMomentDate: function(date) {
@@ -366,11 +384,10 @@
         var body = document.getElementsByTagName('html');
 
         body[0].addEventListener('click', function(e) {
+          var x = e.clientX, y = e.clientY;
+
           var box = document.querySelector('#'+vm.vuekerBoxId).getBoundingClientRect();
           var btn = document.querySelector('#'+vm.vuekerButtonId).getBoundingClientRect();
-
-          var x = e.clientX;
-          var y = e.clientY;
 
           if(vm.isShowlable && !vm.hasClickElement(box,x,y) && !vm.hasClickElement(btn,x,y)) {
             vm.closeCalendar();
@@ -415,6 +432,17 @@
         this.isShowlable = false;
       },
       /**
+       * This function returns true when month is selected
+       *
+       * @param  {[Number]}  month
+       * @param  {[Number]}  year
+       * @return {Boolean}
+       */
+      hasSelectMonth: function(month,year) {
+        return this.selectedDate.month() == month
+            && this.selectedDate.year() == year;
+      },
+      /**
        * This function returns true when [date] is a selected date
        *
        * @param  {[moment]}  date
@@ -431,7 +459,8 @@
        * @param {[Date]} date
        */
       setSelectedDate: function(date) {
-        if (date.disabled) { return; }
+        if (date.disabled ) { return; }
+
         this.selectedDate = moment(date.raw);
 
         if (!date.isMonth) {
@@ -492,10 +521,17 @@
        * @return {[Boolean]}
        */
       isDisabled: function(date) {
+        var isntInRenderRange = !visibleDates.itsInDateRange(date,this.mutable.startDate,this.mutable.endDate);
 
-        return (this.visibleDates.mode === 'enable') ? !this.runRules(date, this.visibleDates.rules) : this.runRules(date, this.visibleDates.rules);
+        var ruleResults = (this.visibleDates.mode === 'enable') 
+                        ? !this.runRules(date, this.visibleDates.rules) 
+                        : this.runRules(date, this.visibleDates.rules);
+                        
+        return isntInRenderRange ? isntInRenderRange : ruleResults;
       },
-
+      /**
+       * 
+       */
       runRules: function(date, rules) {
         for (var index in rules) {
           var ruleIndex = this.getRuleIndex(index);
@@ -525,36 +561,39 @@
       isTodayDisabled: function() {
         return this.isDisabled(moment());
       },
+      getCurrentMonth() {
+        return moment(new Date(this.calendar.year,this.calendar.month.number));
+      },
       /**
        * This function returns true when current selected month
-       * is equals minDate
+       * is equals startDate
        *
        * @return {Boolean}
        */
       disabledPrevButton: function() {
-        if (!this.mutable.minDate) { return false; }
+        if (!this.mutable.startDate) { return false; }
 
-        var currentMonth = moment(new Date(this.calendar.year,this.calendar.month.number));
+        var currentMonth = this.getCurrentMonth();
 
-        if (this.mutable.minDate.year() == currentMonth.year()) {
-          return this.mutable.minDate.month() == currentMonth.month()
+        if (this.mutable.startDate.year() == currentMonth.year()) {
+          return this.mutable.startDate.month() == currentMonth.month()
         } else {
           return false;
         }
       },
       /**
        * This function returns true when current selected month
-       * is equals maxDate
+       * is equals endDate
        *
        * @return {Boolean}
        */
       disabledNextButton: function() {
-        if (!this.mutable.maxDate) { return false; }
+        if (!this.mutable.endDate) { return false; }
 
-        var currentMonth = moment(new Date(this.calendar.year,this.calendar.month.number));
+        var currentMonth = this.getCurrentMonth();
 
-        if (this.mutable.maxDate.year() == currentMonth.year()) {
-          return this.mutable.maxDate.month() == currentMonth.month()
+        if (this.mutable.endDate.year() == currentMonth.year()) {
+          return this.mutable.endDate.month() == currentMonth.month()
         } else {
           return false;
         }

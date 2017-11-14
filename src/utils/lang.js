@@ -23,6 +23,28 @@ export default {
 			november: 'November',
 			december: 'December'
 		},
+		shortenedMonths:[
+			[
+				{name:'Jan', key:0},
+				{name:'Feb', key:1},
+				{name:'Mar', key:2}
+			],
+			[
+				{name:'Apr', key:3},
+				{name:'May', key:4},
+				{name:'Jun', key:5}
+			],
+			[
+				{name:'Jul', key:6},
+				{name:'Aug', key:7},
+				{name:'Sep', key:8}
+			],
+			[
+				{name:'Oct', key:9},
+				{name:'Nov', key:10},
+				{name:'Dec', key:11}
+			],
+		],
 		today:'Today',
 	},
 	es: {
@@ -49,6 +71,28 @@ export default {
 			november: 'Noviembre',
 			december: 'Diciembre'
 		},
+		shortenedMonths:[
+			[
+				{name:'Ene', key:0},
+				{name:'Feb', key:1},
+				{name:'Mar', key:2}
+			],
+			[
+				{name:'Abr', key:3},
+				{name:'May', key:4},
+				{name:'Jun', key:5}
+			],
+			[
+				{name:'Jul', key:6},
+				{name:'Ago', key:7},
+				{name:'Sep', key:8}
+			],
+			[
+				{name:'Oct', key:9},
+				{name:'Nov', key:10},
+				{name:'Dic', key:11}
+			],
+		],
 		today:'Hoy'
 	}
 }

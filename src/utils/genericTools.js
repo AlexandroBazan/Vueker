@@ -15,4 +15,8 @@ export default {
   createMomentDate: function(date) {
     return (typeof date == 'string') ? moment(date,this.presets.format) : moment(date);
   },
+  getWindowHeight: function() {
+    return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+  },
+
 }

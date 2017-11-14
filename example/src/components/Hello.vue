@@ -4,9 +4,9 @@
       lang="es"
       format="DD/MM/YYYY"
       placeholder="Seleccione una fecha"
-      init-date="20/07/2017"
-      min-date="13/06/2017"
-      max-date="04/08/2017"
+      init-date="20/12/2017"
+      start-date="05/05/2016"
+      end-date="13/08/2017"
       :sunday-at-the-end="true"
       :visible-dates="visibleDates"
     >
@@ -26,7 +26,6 @@ export default {
       visibleDates: {
         mode:'enable',
         rules: {
-          role:{},
           dates: [
             '19/06/2017',
             '20/07/2017',
@@ -35,8 +34,6 @@ export default {
           ],
           weekdays:[
             'sunday',
-            'monday',
-            'pppp',
           ],
           ranges:[
             {from:'03/07/2017', to:'08/07/2017'},
